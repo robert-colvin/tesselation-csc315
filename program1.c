@@ -5,6 +5,13 @@
 #include <GL/glut.h>
 #include <stdio.h>
 
+//struct for points
+struct pair{
+	int x;
+	int y;
+	struct pair *next;
+};
+
 // These are defined in a global scope
 
 GLubyte red, green, blue;
