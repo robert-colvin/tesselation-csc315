@@ -6,17 +6,19 @@
 #include <stdio.h>
 
 //struct for points
-struct pair{
+typedef struct pair{
 	int x;
 	int y;
+	int w;
 	struct pair *next;
-};
+} vertex;
 
 // These are defined in a global scope
 
 GLubyte red, green, blue;
 int COLORS_DEFINED;
-
+vertex *head = NULL;
+head=malloc(sizeOf(head));
 // Specity the values to place and size the window on the screen
 
 const int WINDOW_POSITION_X = 100;
@@ -127,7 +129,21 @@ void drawBox( int x, int y )
     p[1] = WORLD_COORDINATE_MIN_Y +  p[1] / WINDOW_MAX_Y * 
                                     (WORLD_COORDINATE_MAX_Y - WORLD_COORDINATE_MIN_Y);
 
-   
+    if (head==NULL)
+    {
+	    head->x=p[0];
+	    head->y=p[1];
+    }
+    else
+    {
+	    vertex *nextOne=NULL;
+	    nextOne=malloc(sizeOf(nextOne));
+	    nextOne->x=p[0];
+	    nextOne->y=p[1];
+	    nextOne->next=NULL;
+	    head->next=nextOne;
+    }
+
     printf ("\t  %f   %f (world coordinates) \n", p[0], p[1] );
 
     glBegin(GL_POINTS);
