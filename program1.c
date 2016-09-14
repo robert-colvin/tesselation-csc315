@@ -6,19 +6,19 @@
 #include <stdio.h>
 
 //struct for points
-typedef struct pair{
-	int x;
-	int y;
+typedef struct vertex{
+	GLfloat x;
+	GLfloat y;
 	int w;
-	struct pair *next;
-} vertex;
+	struct vertex *next;
+}vertex;
 
 // These are defined in a global scope
 
 GLubyte red, green, blue;
 int COLORS_DEFINED;
 vertex *head = NULL;
-head=malloc(sizeOf(head));
+
 // Specity the values to place and size the window on the screen
 
 const int WINDOW_POSITION_X = 100;
@@ -133,6 +133,7 @@ void drawBox( int x, int y )
     {
 	    head->x=p[0];
 	    head->y=p[1];
+//    	    printf ("\t  %f   %f (coords in node) \n", head->x, head->y );
     }
     else
     {
@@ -141,6 +142,7 @@ void drawBox( int x, int y )
 	    nextOne->x=p[0];
 	    nextOne->y=p[1];
 	    nextOne->next=NULL;
+  //  	    printf ("\t  %f   %f (coords in node) \n", nextOne->x, nextOne->y );
 	    head->next=nextOne;
     }
 
@@ -153,7 +155,7 @@ void drawBox( int x, int y )
 }
 
 
-void lineEmUp( int x, int y )
+void lineEmUp(void)
 {
     typedef GLfloat point[2];     
     point p;
@@ -198,7 +200,7 @@ void mouse( int button, int state, int x, int y )
   if ( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN )
      {
         //printf ("%d   %d\n", x, y);
-        lineEmUp( x, y );
+        lineEmUp();
      }
   
   if ( button == GLUT_MIDDLE_BUTTON && state == GLUT_DOWN )
@@ -217,7 +219,7 @@ void keyboard( unsigned char key, int x, int y )
 
 int main(int argc, char** argv)
 {
-
+    head=malloc(sizeOf(struct vertex));
     myglutInit(argc,argv); /* Set up Window */
     myInit(); /* set attributes */
 
