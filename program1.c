@@ -20,7 +20,7 @@ int COLORS_DEFINED;
 vertex *head = NULL;
 
 // Specity the values to place and size the window on the screen
-
+//mouse coords
 const int WINDOW_POSITION_X = 100;
 const int WINDOW_POSITION_Y = 100;
 const int WINDOW_MAX_X = 500;
@@ -128,7 +128,7 @@ void drawBox( int x, int y )
 
     p[1] = WORLD_COORDINATE_MIN_Y +  p[1] / WINDOW_MAX_Y * 
                                     (WORLD_COORDINATE_MAX_Y - WORLD_COORDINATE_MIN_Y);
-
+/*
     if (head==NULL)
     {
 	    head->x=p[0];
@@ -145,7 +145,7 @@ void drawBox( int x, int y )
   //  	    printf ("\t  %f   %f (coords in node) \n", nextOne->x, nextOne->y );
 	    head->next=nextOne;
     }
-
+*/
     printf ("\t  %f   %f (world coordinates) \n", p[0], p[1] );
 
     glBegin(GL_POINTS);
@@ -157,7 +157,7 @@ void drawBox( int x, int y )
 
 void lineEmUp(void)
 {
-    typedef GLfloat point[2];     
+/*    typedef GLfloat point[2];     
     point p;
 
     glColor3f( 255.0, 0.0, 0.0 );
@@ -172,12 +172,16 @@ void lineEmUp(void)
 
     p[1] = WORLD_COORDINATE_MIN_Y +  p[1] / WINDOW_MAX_Y * 
                                     (WORLD_COORDINATE_MAX_Y - WORLD_COORDINATE_MIN_Y);
-//MAKE THESE LINES---------------------------------------------------------------------------------------------------------------------------------------------------------
+*/
+//MAKE THESE LINES-----------------------------------------------------------------------------------------------------------------------------
+    //glLineWidth(2.5);
+    //glColor3ub(red, green, blue);
     glBegin(GL_LINES);
-      glVertex2f(255.0, 255.0); 
+    	glVertex2f(10, 10);
+    	glVertex2f(200, 200);
     glEnd();
     glFlush();
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------
 }
 
 
@@ -219,7 +223,7 @@ void keyboard( unsigned char key, int x, int y )
 
 int main(int argc, char** argv)
 {
-    head=malloc(sizeOf(struct vertex));
+    //head=malloc(sizeOf (head));
     myglutInit(argc,argv); /* Set up Window */
     myInit(); /* set attributes */
 
