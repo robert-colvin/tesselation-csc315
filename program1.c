@@ -124,7 +124,7 @@ void drawBox( int x, int y )
 
     p[0] = WORLD_COORDINATE_MIN_X +  p[0] / WINDOW_MAX_X * 
                                     (WORLD_COORDINATE_MAX_X - WORLD_COORDINATE_MIN_X);
-
+//geufbujs
 
     p[1] = WORLD_COORDINATE_MIN_Y +  p[1] / WINDOW_MAX_Y * 
                                     (WORLD_COORDINATE_MAX_Y - WORLD_COORDINATE_MIN_Y);
