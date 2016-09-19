@@ -128,24 +128,25 @@ void drawBox( int x, int y )
 
     p[1] = WORLD_COORDINATE_MIN_Y +  p[1] / WINDOW_MAX_Y * 
                                     (WORLD_COORDINATE_MAX_Y - WORLD_COORDINATE_MIN_Y);
-/*
+
     if (head==NULL)
     {
 	    head->x=p[0];
 	    head->y=p[1];
-//    	    printf ("\t  %f   %f (coords in node) \n", head->x, head->y );
+	    head->next=NULL;
+    	    printf ("\t  %f   %f (coords in node) \n", head->x, head->y );
     }
     else
     {
 	    vertex *nextOne=NULL;
-	    nextOne=malloc(sizeOf(nextOne));
+	    nextOne=malloc(sizeof(nextOne));
 	    nextOne->x=p[0];
 	    nextOne->y=p[1];
 	    nextOne->next=NULL;
-  //  	    printf ("\t  %f   %f (coords in node) \n", nextOne->x, nextOne->y );
+    	    printf ("\t  %f   %f (head is not null) \n", nextOne->x, nextOne->y );
 	    head->next=nextOne;
     }
-*/
+
     printf ("\t  %f   %f (world coordinates) \n", p[0], p[1] );
 
     glBegin(GL_POINTS);
@@ -223,7 +224,8 @@ void keyboard( unsigned char key, int x, int y )
 
 int main(int argc, char** argv)
 {
-    //head=malloc(sizeOf (head));
+    head=malloc(sizeof(head));
+//    head=NULL;
     myglutInit(argc,argv); /* Set up Window */
     myInit(); /* set attributes */
 
