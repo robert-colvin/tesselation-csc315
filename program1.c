@@ -17,7 +17,8 @@ typedef struct vertex{
 
 GLubyte red, green, blue;
 int COLORS_DEFINED;
-vertex *head = NULL;
+vertex *head = NULL, *last = NULL;
+vertex *newVert;
 
 // Specity the values to place and size the window on the screen
 //mouse coords
@@ -101,8 +102,43 @@ void display( void )
  }
 
 
+vertex* makeVertex(GLfloat xCoord, GLfloat yCoord)
+{printf("\n106");
+	newVert =(vertex*) malloc(sizeof(vertex));printf("\n107");
+	if(newVert!=NULL)
+	{printf("\109");
+		newVert->x=xCoord;
+		newVert->y=yCoord;
+		newVert->next=NULL;
+		return newVert;
+	}
+	else
+	{
+		printf("\nPhenomenal failure on node creation");
+		return 0;
+	}
+}
+void addVertex(vertex *newVertex)
+{
+	if(head==last && last==NULL)
+	{printf("\n124");
+		head=last=newVertex;
+		head->next=NULL;
+		last->next=NULL;
+		printf("\nNode at head");
+	}
+	else
+	{
+		last->next=newVertex;
+		last=newVertex;
+		last->next=NULL;
+		printf("\nnode at end of list");
+	}
+}
+
 void drawBox( int x, int y )
 {
+ //   vertex *thisPoint = NULL;
     typedef GLfloat point[2];     
     point p;
 
@@ -128,13 +164,14 @@ void drawBox( int x, int y )
 
     p[1] = WORLD_COORDINATE_MIN_Y +  p[1] / WINDOW_MAX_Y * 
                                     (WORLD_COORDINATE_MAX_Y - WORLD_COORDINATE_MIN_Y);
-
-    if (head==NULL)
+/*
+    if (headPtr==NULL)
     {
-	    head->x=p[0];
-	    head->y=p[1];
-	    head->next=NULL;
-    	    printf ("\t  %f   %f (coords in node) \n", head->x, head->y );
+	    headPtr=malloc(sizeof(headPtr));
+	    headPtr->x=p[0];
+	    headPtr->y=p[1];
+	    headPtr->next=NULL;
+    	    printf ("\t  %f   %f (coords in node) \n", headPtr->x, headPtr->y );
     }
     else
     {
@@ -146,7 +183,10 @@ void drawBox( int x, int y )
     	    printf ("\t  %f   %f (head is not null) \n", nextOne->x, nextOne->y );
 	    head->next=nextOne;
     }
-
+*/
+  //  thisPoint=makeVertex(p[0], p[1]);
+printf("\n188");    addVertex(makeVertex(p[0],p[1]));	printf("\n188after");
+    
     printf ("\t  %f   %f (world coordinates) \n", p[0], p[1] );
 
     glBegin(GL_POINTS);
@@ -154,7 +194,6 @@ void drawBox( int x, int y )
     glEnd();
     glFlush();
 }
-
 
 void lineEmUp(void)
 {
@@ -199,7 +238,7 @@ void mouse( int button, int state, int x, int y )
   if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN )
      {
         //printf ("%d   %d\n", x, y);
-        drawBox( x, y );
+        drawBox( x, y);
      }
 
   if ( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN )
