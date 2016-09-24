@@ -5,116 +5,8 @@ using namespace std;
 #include <GL/glut.h>
 #include <stdio.h>
 #include <iostream>
-//struct for points
-struct vertex
-{
-	GLfloat x;
-	GLfloat y;
-	int w;
-	vertex *next;
-}*head;
-
-//class for linkedlist with create, append, and delete
-//-----------------------------------------------------------------------------
-class singly
-{
-	public:
-		vertex* createVertex(GLfloat xCoord, GLfloat yCoord);
-		void append(vertex *node);
-		void deleteVertex(vertex *node);
-		void deleteTheWholeDamnThing();
-//		int findVertex();
-		vertex *head;
-		singly()
-		{
-			head=NULL;
-		}
-};
-
-vertex* singly::createVertex(GLfloat xCoord, GLfloat yCoord)
-{
-	struct vertex *temp;
-	temp = new(struct vertex);
-	if(temp==NULL)
-	{
-		cout << "catastrophe in creation. line 38" << endl;
-		return 0;
-	}
-	else
-	{
-		temp->x=xCoord;
-		temp->y=yCoord;
-		temp->next=NULL;
-		return temp;
-	}
-}
-void singly::append(vertex *node)
-{
-	struct vertex *tempStart;
-	tempStart=head;
-	if(head==NULL)
-	{//if list is empty aka this is first entry
-		head=node;
-		head->next=NULL;
-		cout << "NEW HEAD IS " << node->x << " " << node->y << endl;
-	}
-	else
-	{//otherwise...
-		while(tempStart->next != NULL)//until you get to last node
-		{//move down the list one by one
-			 tempStart=tempStart->next;
-		}//when you get to last node...
-		//ensure new node's next is NULL to be safe or something
-		node->next=NULL;
-		//append new node to last node in list
-		tempStart->next=node;
-		cout << "APPENDED " << node->x << " " << node->y << endl;//announce it for the world to see
-	}
-}
-
-void singly::deleteVertex(vertex *node)
-{
-	struct vertex *temp=head;
-	if (head==node)
-	{
-		if(head->next!=NULL)
-		{
-			temp = head;
-			head=head->next;
-			delete temp;
-			delete node;
-		}
-		else if(head->next==NULL)
-			head=NULL;
-	}
-	else
-	{
-		while(temp->next != node)
-		{
-			if(temp->next==NULL)
-			{
-				cout << "error in search for deletion. 91" << endl;
-			}
-			temp=temp->next;
-		}
-		temp->next=temp->next->next;
-		delete node;
-		return;
-	}
-}
-void singly::deleteTheWholeDamnThing()
-{
-	vertex *deadManWalking=head;
-	while(head!=NULL)
-	{
-		head=head->next;
-		deadManWalking=NULL;
-		delete deadManWalking;
-	}
-
-}
-//CLASS END
-//----------------------------------------------------------------------
+#include "structs.h"
+#include "singly.cpp"
 
 // These are defined in a global scope
 
@@ -123,6 +15,7 @@ int COLORS_DEFINED;
 
 singly linkedList;
 struct vertex *lastPoint=NULL;
+struct vertex *twoPointsAgo=NULL;
 
 float scaledx;
 float scaledy;
@@ -228,18 +121,66 @@ void display( void )
  }
 
 
-GLfloat crossProduct(struct vertex *point1, struct vertex *point2)
+GLfloat crossProduct(struct vertex *point1, struct vertex *point2, struct vertex *point3)
 {
-	if(point1==NULL)
+	if(point1==NULL || point2==NULL)
 		return 0;
 	
-	GLfloat x1 = point1->x, y1 = point1->y;
-	GLfloat x2 = point2->x, y2 = point1->y;
-	GLfloat crossProduct;
+	GLfloat line1x, line1y, line1z, line2x, line2y, line2z, crossProduct;
+	
+	line1x = (point1->x) - (point2->x);
+	line1y = (point1->y) - (point2->y);
+	line1z = 0.0;
 
-	crossProduct = (x1 * y2) - (x2 * y1);
+	line2x = (point3->x) - (point2->x);
+	line2y = (point3->y) - (point2->y);
+	line2z = 0.0;
+
+	crossProduct = (line1x * line2y) - (line2x * line1y);
 
 	return crossProduct;
+}
+
+bool intersect(vertex *point1, vertex *point2, vertex *point3, vertex *point4)
+{
+	bool intersects = false;
+
+	GLfloat ua, ub, x1, x2, x3, x4, y1, y2, y3, y4, numerator_a, numerator_b, denominator;
+
+	x1 = point1->x; y1 = point1->y;
+	x2 = point2->x; y2 = point2->y;
+	x3 = point3->x; y3 = point3->y;
+	x4 = point4->x; y4 = point4->y;
+	
+	numerator_a = ((x3-x1) * -(y4-y3)) - (-(x4-x3) * (y3-y1));
+	numerator_b = ((x2-x1) *  (x3-x1)) - ( (x3-x1) * (y2-y1));
+	denominator = ((x2-x1) * -(y4-y3)) - (-(x4-x3) * (y2-y1));
+
+	ua = numerator_a/denominator;
+	ub = numerator_b/denominator;
+
+	if (0 < ua && ua < 1 &&
+	    0 < ub && ub < 1)
+	{
+		intersects = true;
+	}
+	return intersects;
+}
+
+bool noIntersects(singly linkedlist,vertex *lastVertex, vertex *newVertex)
+{
+	if (linkedlist.getLength() < 3)
+		return true;
+
+	struct vertex *anotherLineVertex1=linkedlist.head;
+	struct vertex *anotherLineVertex2=linkedlist.head->next;
+
+	for (int i = 0; i < linkedlist.getLength(); i++)
+	{
+		if(intersect(lastVertex, newVertex, anotherLineVertex1, anotherLineVertex2))
+			return false;
+	}
+	return true;
 }
 
 void drawBox( int x, int y )
@@ -272,7 +213,7 @@ void drawBox( int x, int y )
 
     vertex *newVertex = linkedList.createVertex(p[0],p[1]);
     
-    if(crossProduct(lastPoint, newVertex) <= 0.0)
+    if(crossProduct(twoPointsAgo, lastPoint, newVertex) <= 0.0 && noIntersects(linkedList, lastPoint, newVertex))
     {
     	linkedList.append(newVertex); 
    
@@ -282,6 +223,7 @@ void drawBox( int x, int y )
 		    glVertex2fv(p); 
 	    glEnd();
 	    glFlush();
+	    twoPointsAgo=lastPoint;
 	    lastPoint=newVertex;	
     }
     else
