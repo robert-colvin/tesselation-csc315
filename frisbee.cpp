@@ -120,7 +120,7 @@ void display( void )
 
  }
 
-
+//CROSSPRODUCT WORKS FOR SURE
 GLfloat crossProduct(struct vertex *point1, struct vertex *point2, struct vertex *point3)
 {
 	if(point1==NULL || point2==NULL)
