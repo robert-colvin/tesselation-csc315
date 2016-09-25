@@ -25,7 +25,7 @@ int singly::getLength()
 		i++;
 	}
 }
-
+//
 vertex* singly::createVertex(GLfloat xCoord, GLfloat yCoord)
 {
 	struct vertex *temp;

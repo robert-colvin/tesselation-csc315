@@ -1,4 +1,4 @@
-
+//
 struct vertex
 {
 	GLfloat x;

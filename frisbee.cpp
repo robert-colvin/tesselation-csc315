@@ -140,7 +140,7 @@ GLfloat crossProduct(struct vertex *point1, struct vertex *point2, struct vertex
 
 	return crossProduct;
 }
-
+//
 bool intersect(vertex *point1, vertex *point2, vertex *point3, vertex *point4)
 {
 	bool intersects = false;
