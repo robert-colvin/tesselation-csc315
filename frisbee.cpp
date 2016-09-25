@@ -153,7 +153,7 @@ bool intersect(vertex *point1, vertex *point2, vertex *point3, vertex *point4)
 	x4 = point4->x; y4 = point4->y;
 	
 	numerator_a = ((x3-x1) * -(y4-y3)) - (-(x4-x3) * (y3-y1));
-	numerator_b = ((x2-x1) *  (x3-x1)) - ( (x3-x1) * (y2-y1));
+	numerator_b = ((x2-x1) *  (y3-y1)) - ( (x3-x1) * (y2-y1));
 	denominator = ((x2-x1) * -(y4-y3)) - (-(x4-x3) * (y2-y1));
 
 	ua = numerator_a/denominator;
