@@ -18,7 +18,6 @@ typedef struct vertex{
 GLubyte red, green, blue;
 int COLORS_DEFINED;
 vertex *head = NULL, *last = NULL;
-vertex *newVert;
 
 // Specity the values to place and size the window on the screen
 //mouse coords
@@ -104,19 +103,22 @@ void display( void )
 
 vertex* makeVertex(GLfloat xCoord, GLfloat yCoord)
 {printf("\n106");
-	newVert =(vertex*) malloc(sizeof(vertex));printf("\n107");
-	if(newVert!=NULL)
-	{printf("\109");
-		newVert->x=xCoord;
-		newVert->y=yCoord;
-		newVert->next=NULL;
+	vertex newVertex;
+printf("\n107");
+	//vertex *newVertPtr = malloc(sizeof(newVert));	printf("\n107");
+	/*if(newVert!=NULL)
+	{printf("\n109");*/
+		newVertex.x=xCoord;
+		newVertex.y=yCoord;
+		printf("\n113 before");newVertex.next=NULL;printf("\n113");
+		vertex* newVert=&newVertex;
 		return newVert;
-	}
-	else
-	{
-		printf("\nPhenomenal failure on node creation");
-		return 0;
-	}
+//	}
+//	else
+//	{
+//		printf("\nPhenomenal failure on node creation");
+//		return 0;
+//	}
 }
 void addVertex(vertex *newVertex)
 {
