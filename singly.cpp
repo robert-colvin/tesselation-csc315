@@ -11,12 +11,16 @@ class singly
 		singly()
 		{
 			head=NULL;
+			length=0;
 		}
+	private:
+		int length;
 };
 
 int singly::getLength()
 {
-	int i=0;
+	return length;
+/*	int i=0;
 	struct vertex *currentVert=head;
 
 	while (currentVert != NULL)
@@ -24,6 +28,8 @@ int singly::getLength()
 		currentVert=currentVert->next;
 		i++;
 	}
+	return i;
+*/
 }
 //
 vertex* singly::createVertex(GLfloat xCoord, GLfloat yCoord)
@@ -65,11 +71,14 @@ void singly::append(vertex *node)
 		tempStart->next=node;
 		cout << "APPENDED " << node->x << " " << node->y << endl;//announce it for the world to see
 	}
+	length++;
 }
 
 void singly::deleteVertex(vertex *node)
 {
 	struct vertex *temp=head;
+	if (length==0)
+		return;
 	if (head==node)
 	{
 		if(head->next!=NULL)
@@ -96,6 +105,7 @@ void singly::deleteVertex(vertex *node)
 		delete node;
 		return;
 	}
+	length--;
 }
 void singly::deleteTheWholeDamnThing()
 {
@@ -106,5 +116,5 @@ void singly::deleteTheWholeDamnThing()
 		deadManWalking=NULL;
 		delete deadManWalking;
 	}
-
+	length=0;
 }

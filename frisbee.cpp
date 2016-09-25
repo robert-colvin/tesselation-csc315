@@ -172,15 +172,22 @@ bool noIntersects(singly linkedlist,vertex *lastVertex, vertex *newVertex)
 	if (linkedlist.getLength() < 3)
 		return true;
 
+	struct vertex *tmp = linkedlist.head;
 	struct vertex *anotherLineVertex1=linkedlist.head;
 	struct vertex *anotherLineVertex2=linkedlist.head->next;
-
-	for (int i = 0; i < linkedlist.getLength(); i++)
-	{
+	cout << "L177" << endl;
+//	for (int i = 0; i < linkedlist.getLength(); i++)
+	while (anotherLineVertex2!=NULL)
+	{cout << "L181" << endl;
 		if(intersect(lastVertex, newVertex, anotherLineVertex1, anotherLineVertex2))
+		{cout << "L183" <<endl;
 			return false;
+		}
+//		tmp=tmp->next;
+		anotherLineVertex1=anotherLineVertex2;cout << "L187	" << endl;
+		anotherLineVertex2=anotherLineVertex2->next;cout<<"L185          "<< endl;
 	}
-	return true;
+	cout<<"L187"<<cout;return true;
 }
 
 void drawBox( int x, int y )
@@ -224,7 +231,8 @@ void drawBox( int x, int y )
 	    glEnd();
 	    glFlush();
 	    twoPointsAgo=lastPoint;
-	    lastPoint=newVertex;	
+	    lastPoint=newVertex;
+	    cout << linkedList.getLength() << endl;
     }
     else
     {
@@ -323,6 +331,7 @@ void keyboard( unsigned char key, int x, int y )
 	clearBox();
 	linkedList.deleteTheWholeDamnThing();
 	lastPoint=NULL;
+	twoPointsAgo=NULL;
   }
 }
 
