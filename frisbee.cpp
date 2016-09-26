@@ -172,22 +172,20 @@ bool noIntersects(singly linkedlist,vertex *lastVertex, vertex *newVertex)
 	if (linkedlist.getLength() < 3)
 		return true;
 
-	struct vertex *tmp = linkedlist.head;
+	struct vertex *headChecker = linkedlist.head;
 	struct vertex *anotherLineVertex1=linkedlist.head;
 	struct vertex *anotherLineVertex2=linkedlist.head->next;
-	cout << "L177" << endl;
-//	for (int i = 0; i < linkedlist.getLength(); i++)
 	while (anotherLineVertex2!=NULL)
-	{cout << "L181" << endl;
-		if(intersect(lastVertex, newVertex, anotherLineVertex1, anotherLineVertex2))
-		{cout << "L183" <<endl;
+	{
+		if(intersect(lastVertex, newVertex, anotherLineVertex1, anotherLineVertex2) || 
+		   intersect(newVertex, headChecker,anotherLineVertex1, anotherLineVertex2))	
 			return false;
-		}
-//		tmp=tmp->next;
-		anotherLineVertex1=anotherLineVertex2;cout << "L187	" << endl;
-		anotherLineVertex2=anotherLineVertex2->next;cout<<"L185          "<< endl;
+
+		anotherLineVertex1=anotherLineVertex2;
+		anotherLineVertex2=anotherLineVertex2->next;
 	}
-	cout<<"L187"<<cout;return true;
+
+	return true;
 }
 
 void drawBox( int x, int y )
@@ -220,7 +218,7 @@ void drawBox( int x, int y )
 
     vertex *newVertex = linkedList.createVertex(p[0],p[1]);
     
-    if(crossProduct(twoPointsAgo, lastPoint, newVertex) <= 0.0 && noIntersects(linkedList, lastPoint, newVertex))
+    if(/*crossProduct(twoPointsAgo, lastPoint, newVertex) <= 0.0 &&*/ noIntersects(linkedList, lastPoint, newVertex))
     {
     	linkedList.append(newVertex); 
    
@@ -232,7 +230,6 @@ void drawBox( int x, int y )
 	    glFlush();
 	    twoPointsAgo=lastPoint;
 	    lastPoint=newVertex;
-	    cout << linkedList.getLength() << endl;
     }
     else
     {
