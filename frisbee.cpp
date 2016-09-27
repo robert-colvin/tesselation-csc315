@@ -53,7 +53,7 @@ void myInit(void)
 
       glClearColor(1.0, 1.0, 1.0, 1.0); /* white background */
       glColor3f(1.0, 0.0, 0.0); /* draw in red */
-      glPointSize(10.0);
+      glPointSize(5.0);
 
       COLORS_DEFINED = 0;
 
@@ -218,7 +218,7 @@ void drawBox( int x, int y )
 
     vertex *newVertex = linkedList.createVertex(p[0],p[1]);
     
-    if(/*crossProduct(twoPointsAgo, lastPoint, newVertex) <= 0.0 &&*/ noIntersects(linkedList, lastPoint, newVertex))
+    if(/*crossProduct(twoPointsAgo, lastPoint, newVertex) < 0.0 &&*/ noIntersects(linkedList, lastPoint, newVertex))
     {
     	linkedList.append(newVertex); 
    
@@ -237,7 +237,7 @@ void drawBox( int x, int y )
     }
 }
 
-void makeThePolygon()
+void makeThePolygonSucka()
 {
 	struct vertex *pointy = linkedList.head;
 	glBegin(GL_POLYGON);
@@ -275,6 +275,60 @@ void lineEmUpSucka()
 		glVertex2f(linkedList.head->x, linkedList.head->y);
 	glEnd();
 	glFlush();
+}
+void tesselateItSucka()
+{
+	lineEmUpSucka();
+	if (linkedList.getLength() <= 3)
+		return;
+	else if (linkedList.getLength() == 4)
+	{
+		struct vertex *corner1 = linkedList.head;
+		struct vertex *corner2 = linkedList.head->next->next;
+
+		glBegin(GL_LINES);
+			glVertex2f(corner1->x, corner1->y);
+			glVertex2f(corner2->x, corner2->y);
+		glEnd();
+		glFlush();
+	}
+	else
+	{
+		struct vertex *p1 = linkedList.head;
+		struct vertex *p2 = p1->next;
+		struct vertex *p3 = p2->next;
+		struct vertex *intersecty = new struct vertex;
+		while (linkedList.getLength() > 3)
+		{
+			if (crossProduct(p1, p2, p3) > 0.0)//GREATER THAN 180
+			{
+				p1=p2;
+				p2=p3;
+				p3=p3->next;
+			}
+			else if (crossProduct(p1, p2, p3) == 0.0)//LINEAR
+			{
+				p2=p3;
+				p3=p3->next;
+			}
+			else//LESS THAN 180 => COUNTERCLOCKWISE
+			{
+				if(noIntersects(linkedList, p1, p3))
+				{
+					glBegin(GL_LINES);
+						glVertex2f(p1->x, p1->y);
+						glVertex2f(p3->x, p3->y);
+					glEnd();
+					glFlush();
+					
+					linkedList.deleteVertex(p2);
+
+					p2=p3;
+					p3=p3->next;
+				}
+			}
+		}
+	}
 }
 
 void eraseBox( int x, int y )
@@ -345,7 +399,10 @@ void keyboard( unsigned char key, int x, int y )
 	twoPointsAgo=NULL;
   }
   if ( key == 'p' || key == 'P')
-	  makeThePolygon();
+	  makeThePolygonSucka();
+  
+  if ( key == 't' || key == 'T')
+	  tesselateItSucka();
 }
 
 
