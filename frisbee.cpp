@@ -237,6 +237,20 @@ void drawBox( int x, int y )
     }
 }
 
+void makeThePolygon()
+{
+	struct vertex *pointy = linkedList.head;
+	glBegin(GL_POLYGON);
+		while(pointy!=NULL)
+		{
+			glVertex2f(pointy->x, pointy->y);
+			pointy = pointy->next;
+		}
+	glEnd();
+	glFlush();
+}
+
+
 void lineEmUpSucka()
 {
 	if (linkedList.head==NULL || linkedList.head->next==NULL)
@@ -330,6 +344,8 @@ void keyboard( unsigned char key, int x, int y )
 	lastPoint=NULL;
 	twoPointsAgo=NULL;
   }
+  if ( key == 'p' || key == 'P')
+	  makeThePolygon();
 }
 
 
