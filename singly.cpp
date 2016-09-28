@@ -10,6 +10,7 @@ class singly
 		vertex *head;
 		singly()
 		{
+			head = new struct vertex;
 			head=NULL;
 			length=0;
 		}
@@ -20,16 +21,6 @@ class singly
 int singly::getLength()
 {
 	return length;
-/*	int i=0;
-	struct vertex *currentVert=head;
-
-	while (currentVert != NULL)
-	{
-		currentVert=currentVert->next;
-		i++;
-	}
-	return i;
-*/
 }
 //
 vertex* singly::createVertex(GLfloat xCoord, GLfloat yCoord)
@@ -76,36 +67,39 @@ void singly::append(vertex *node)
 
 void singly::deleteVertex(vertex *node)
 {
-	struct vertex *temp=head;
+
 	if (length==0)
 		return;
-	if (head==node)
+	else if (head==node) 
 	{
-		if(head->next!=NULL)
+		if(head->next==NULL)
 		{
-			temp = head;
-			head=head->next;
-			delete temp;
 			delete node;
+			head=new struct vertex;
+			return;
 		}
-		else if(head->next==NULL)
-			head=NULL;
-	}
-	else
-	{
-		while(temp->next != node)
-		{
-			if(temp->next==NULL)
-			{
-				cout << "error in search for deletion. 91" << endl;
-			}
-			temp=temp->next;
-		}
-		temp->next=temp->next->next;
+		
+		head->x=head->next->x;
+		head->y=head->next->y;
+		node = head->next;
+		head->next=head->next->next;
 		delete node;
-		return;
+
+		length--;
 	}
-	length--;
+	else 
+	{
+		struct vertex *lastVert = head;
+		while(lastVert->next!=node && lastVert->next!=NULL)
+			lastVert=lastVert->next;
+
+		if (lastVert->next==NULL)
+			return;
+
+		lastVert->next=lastVert->next->next;
+		delete node;
+		length--;
+	}
 }
 void singly::deleteTheWholeDamnThing()
 {

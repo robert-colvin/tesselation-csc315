@@ -218,7 +218,7 @@ void drawBox( int x, int y )
 
     vertex *newVertex = linkedList.createVertex(p[0],p[1]);
     
-    if(/*crossProduct(twoPointsAgo, lastPoint, newVertex) < 0.0 &&*/ noIntersects(linkedList, lastPoint, newVertex))
+    if(noIntersects(linkedList, lastPoint, newVertex))
     {
     	linkedList.append(newVertex); 
    
@@ -250,9 +250,16 @@ void makeThePolygonSucka()
 	glFlush();
 }
 
+void whiteItOut()
+{
+	glColor3f(1.0, 1.0, 1.0);
+	makeThePolygonSucka();
+	glColor3f(1.0, 0.0, 0.0);
+}
 
 void lineEmUpSucka()
 {
+	
 	if (linkedList.head==NULL || linkedList.head->next==NULL)
 	{
 		cout << "can't draw lines with fewer than 2 points" << endl;
@@ -276,60 +283,60 @@ void lineEmUpSucka()
 	glEnd();
 	glFlush();
 }
+singly commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *p2, struct vertex *p3)
+{
+	if (p1==NULL || p2 ==NULL || p3==NULL)
+		return linkedlist;
+	if(crossProduct(p1, p2, p3) < 0.0 && noIntersects(linkedlist, p1, p3))
+	{
+		glBegin(GL_LINES);
+			glVertex2f(p1->x, p1->y);
+			glVertex2f(p3->x, p3->y);
+		glEnd();
+		glFlush();
+	
+		linkedlist.deleteVertex(p2);
+	
+		return linkedlist;
+	}
+	else
+	{
+		p1=p2;
+		p2=p3;
+		p3=p3->next;
+
+		linkedlist = commenceTesselation(linkedlist, p1, p2 , p3);
+	}
+}
 void tesselateItSucka()
 {
 	lineEmUpSucka();
 	if (linkedList.getLength() <= 3)
 		return;
-	else if (linkedList.getLength() == 4)
-	{
-		struct vertex *corner1 = linkedList.head;
-		struct vertex *corner2 = linkedList.head->next->next;
-
-		glBegin(GL_LINES);
-			glVertex2f(corner1->x, corner1->y);
-			glVertex2f(corner2->x, corner2->y);
-		glEnd();
-		glFlush();
-	}
 	else
 	{
 		struct vertex *p1 = linkedList.head;
 		struct vertex *p2 = p1->next;
 		struct vertex *p3 = p2->next;
-		struct vertex *intersecty = new struct vertex;
-		while (linkedList.getLength() > 3)
-		{
-			if (crossProduct(p1, p2, p3) > 0.0)//GREATER THAN 180
-			{
-				p1=p2;
-				p2=p3;
-				p3=p3->next;
-			}
-			else if (crossProduct(p1, p2, p3) == 0.0)//LINEAR
-			{
-				p2=p3;
-				p3=p3->next;
-			}
-			else//LESS THAN 180 => COUNTERCLOCKWISE
-			{
-				if(noIntersects(linkedList, p1, p3))
-				{
-					glBegin(GL_LINES);
-						glVertex2f(p1->x, p1->y);
-						glVertex2f(p3->x, p3->y);
-					glEnd();
-					glFlush();
-					
-					linkedList.deleteVertex(p2);
 
-					p2=p3;
-					p3=p3->next;
-				}
+		while (linkedList.getLength() >= 3 && p2->next!=NULL)
+		{cout<<323<<endl;
+/*			if (crossProduct(p1, p2, p3) < 0.0 && noIntersects(linkedList, p1, p3))
+			{
+				linkedList = commenceTesselation(linkedList, p1, p2, p3);
 			}
-		}
-	}
-}
+			else 
+			{
+				
+			}	
+*/
+			cout<<333<<endl;	linkedList = commenceTesselation(linkedList, p1, p2, p3);
+			cout<<334<<endl;	p1 = linkedList.head;
+			cout<<335<<endl;	p2 = p1->next;
+			cout<<336<<endl;	p3 = p2->next;
+		cout<<337<<endl;}
+	cout<<338<<endl;}
+cout<<339<<endl;}
 
 void eraseBox( int x, int y )
 {
@@ -377,6 +384,7 @@ void mouse( int button, int state, int x, int y )
      {
         //printf ("%d   %d\n", x, y);
         //eraseBox( x, y );
+	whiteItOut();
         lineEmUpSucka();
      }
   
@@ -398,11 +406,17 @@ void keyboard( unsigned char key, int x, int y )
 	lastPoint=NULL;
 	twoPointsAgo=NULL;
   }
-  if ( key == 'p' || key == 'P')
+  if ( key == 'l' || key == 'L'){
+	  whiteItOut();
+	  lineEmUpSucka();
+  }
+  if ( key == 'p' || key == 'P' || key == 'f' || key == 'F')
 	  makeThePolygonSucka();
   
-  if ( key == 't' || key == 'T')
+  if ( key == 't' || key == 'T'){
+	  whiteItOut();
 	  tesselateItSucka();
+  }
 }
 
 
