@@ -7,6 +7,7 @@ class singly
 		void deleteVertex(vertex *node);
 		void deleteTheWholeDamnThing();
 		int getLength();
+		void printList();
 		vertex *head;
 		singly()
 		{
@@ -121,4 +122,15 @@ void singly::deleteTheWholeDamnThing()
 		delete deadManWalking;
 	}
 	length=0;
+}
+void singly::printList()
+{
+	vertex *printy=head;
+	cout << "\n------------------------\nhead\n";
+	while(printy!=NULL)
+	{
+		cout<<printy->x<<", "<<printy->y<<endl;
+		printy=printy->next;
+	}
+	cout<<"----------------------------\n";
 }

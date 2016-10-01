@@ -295,11 +295,12 @@ singly commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *
 		glEnd();
 		glFlush();
 		cout<<297<<endl;
+		cout<<"pre-delete"<<endl;
+		linkedlist.printList();
 		linkedlist.deleteVertex(p2);
+		cout<<"post-delete"<<endl;
+		linkedlist.printList();
 		cout<<299<<endl;
-		p1=linkedlist.head;cout<<300<<endl;
-		p2=p1->next;cout<<301<<endl;
-		p3=p2->next;cout<<302<<endl;
 
 		return linkedlist;
 	}
@@ -309,7 +310,7 @@ singly commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *
 		p2=p3;cout<<309<<endl;
 		p3=p3->next;cout<<310<<endl;
 
-		linkedlist = commenceTesselation(linkedlist, p1, p2 , p3);
+		linkedlist = commenceTesselation(linkedlist, p1, p2 , p3);cout<<"after angle > 180, list is\n";linkedlist.printList();
 		cout<<313<<endl;
 	}
 }
@@ -326,10 +327,11 @@ void tesselateItSucka()
 
 		while (linkedList.getLength() > 3)
 		{cout<<323<<endl;
-			cout<<333<<endl;	linkedList = commenceTesselation(linkedList, p1, p2, p3);
-			//cout<<334<<endl;	p1 = linkedList.head;
-			//cout<<335<<endl;	p2 = p1->next;
-			//cout<<336<<endl;	p3 = p2->next;
+			cout<<333<<endl;				linkedList = commenceTesselation(linkedList, p1, p2, p3);
+cout<<331<endl;	/*CRASHING HERE, LIST ISN'T RIGHT, RETURNING WRONG FROM COMMENCE?*/		linkedList.printList();
+			cout<<334<<endl;				p1 = linkedList.head;cout<<"p1 = "<<p1->x<<", "<<p1->y<<endl;
+			cout<<335<<endl;				p2 = p1->next;cout<<"p2 = "<<p2->x<<", "<<p2->y<<endl;
+			cout<<336<<endl;				p3 = p2->next;cout<<"p3 = "<<p3->x<<", "<<p3->y<<endl;
 		cout<<337<<endl;}
 	cout<<338<<endl;}
 cout<<339<<endl;}
