@@ -283,10 +283,10 @@ void lineEmUpSucka()
 	glEnd();
 	glFlush();
 }
-singly commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *p2, struct vertex *p3)
+/*singly*/void commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *p2, struct vertex *p3)
 {
 	if (p1==NULL || p2 ==NULL || p3==NULL)
-		return linkedlist;
+		return/* linkedlist*/;
 	if(crossProduct(p1, p2, p3) < 0.0 && noIntersects(linkedlist, p1, p3))
 	{cout<<291<<endl;
 		glBegin(GL_LINES);
@@ -302,7 +302,7 @@ singly commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *
 		linkedlist.printList();
 		cout<<299<<endl;
 
-		return linkedlist;
+//		return linkedlist;
 	}
 	else
 	{
@@ -310,7 +310,7 @@ singly commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *
 		p2=p3;cout<<309<<endl;
 		p3=p3->next;cout<<310<<endl;
 
-		linkedlist = commenceTesselation(linkedlist, p1, p2 , p3);cout<<"after angle > 180, list is\n";linkedlist.printList();
+		/*linkedlist = */commenceTesselation(linkedlist, p1, p2 , p3);cout<<"after angle > 180, list is\n";linkedlist.printList();
 		cout<<313<<endl;
 	}
 }
@@ -327,7 +327,7 @@ void tesselateItSucka()
 
 		while (linkedList.getLength() > 3)
 		{cout<<323<<endl;
-			cout<<333<<endl;			linkedList = commenceTesselation(linkedList, p1, p2, p3);cout<<"after returning the list"<<endl;	
+			cout<<333<<endl;			/*linkedList = */commenceTesselation(linkedList, p1, p2, p3);cout<<"after returning the list"<<endl;	
 /*CRASHING HERE, LIST ISN'T RIGHT, RETURNING WRONG FROM COMMENCE?*/  	linkedList.printList();
 			cout<<334<<endl;				p1 = linkedList.head;cout<<"p1 = "<<p1->x<<", "<<p1->y<<endl;
 			cout<<335<<endl;				p2 = p1->next;cout<<"p2 = "<<p2->x<<", "<<p2->y<<endl;
