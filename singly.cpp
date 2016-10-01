@@ -20,6 +20,14 @@ class singly
 
 int singly::getLength()
 {
+	
+	length=0;
+	vertex *county = head;
+	while (county!=NULL)
+	{
+		county=county->next;
+		length++;
+	}
 	return length;
 }
 //
@@ -68,7 +76,7 @@ void singly::append(vertex *node)
 void singly::deleteVertex(vertex *node)
 {
 
-	if (length==0)
+	if (getLength()==0)
 		return;
 	else if (head==node) 
 	{
@@ -83,6 +91,7 @@ void singly::deleteVertex(vertex *node)
 		head->y=head->next->y;
 		node = head->next;
 		head->next=head->next->next;
+		node=NULL;
 		delete node;
 
 		length--;
@@ -97,6 +106,7 @@ void singly::deleteVertex(vertex *node)
 			return;
 
 		lastVert->next=lastVert->next->next;
+		node=NULL;
 		delete node;
 		length--;
 	}

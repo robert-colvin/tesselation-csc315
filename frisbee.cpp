@@ -288,24 +288,29 @@ singly commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *
 	if (p1==NULL || p2 ==NULL || p3==NULL)
 		return linkedlist;
 	if(crossProduct(p1, p2, p3) < 0.0 && noIntersects(linkedlist, p1, p3))
-	{
+	{cout<<291<<endl;
 		glBegin(GL_LINES);
 			glVertex2f(p1->x, p1->y);
 			glVertex2f(p3->x, p3->y);
 		glEnd();
 		glFlush();
-	
+		cout<<297<<endl;
 		linkedlist.deleteVertex(p2);
-	
+		cout<<299<<endl;
+		p1=linkedlist.head;cout<<300<<endl;
+		p2=p1->next;cout<<301<<endl;
+		p3=p2->next;cout<<302<<endl;
+
 		return linkedlist;
 	}
 	else
 	{
-		p1=p2;
-		p2=p3;
-		p3=p3->next;
+		p1=p2;cout<<308<<endl;
+		p2=p3;cout<<309<<endl;
+		p3=p3->next;cout<<310<<endl;
 
 		linkedlist = commenceTesselation(linkedlist, p1, p2 , p3);
+		cout<<313<<endl;
 	}
 }
 void tesselateItSucka()
@@ -319,21 +324,12 @@ void tesselateItSucka()
 		struct vertex *p2 = p1->next;
 		struct vertex *p3 = p2->next;
 
-		while (linkedList.getLength() >= 3 && p2->next!=NULL)
+		while (linkedList.getLength() > 3)
 		{cout<<323<<endl;
-/*			if (crossProduct(p1, p2, p3) < 0.0 && noIntersects(linkedList, p1, p3))
-			{
-				linkedList = commenceTesselation(linkedList, p1, p2, p3);
-			}
-			else 
-			{
-				
-			}	
-*/
 			cout<<333<<endl;	linkedList = commenceTesselation(linkedList, p1, p2, p3);
-			cout<<334<<endl;	p1 = linkedList.head;
-			cout<<335<<endl;	p2 = p1->next;
-			cout<<336<<endl;	p3 = p2->next;
+			//cout<<334<<endl;	p1 = linkedList.head;
+			//cout<<335<<endl;	p2 = p1->next;
+			//cout<<336<<endl;	p3 = p2->next;
 		cout<<337<<endl;}
 	cout<<338<<endl;}
 cout<<339<<endl;}
