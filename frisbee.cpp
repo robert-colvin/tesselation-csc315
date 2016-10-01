@@ -327,8 +327,8 @@ void tesselateItSucka()
 
 		while (linkedList.getLength() > 3)
 		{cout<<323<<endl;
-			cout<<333<<endl;				linkedList = commenceTesselation(linkedList, p1, p2, p3);
-cout<<331<endl;	/*CRASHING HERE, LIST ISN'T RIGHT, RETURNING WRONG FROM COMMENCE?*/		linkedList.printList();
+			cout<<333<<endl;			linkedList = commenceTesselation(linkedList, p1, p2, p3);cout<<"after returning the list"<endl;	
+/*CRASHING HERE, LIST ISN'T RIGHT, RETURNING WRONG FROM COMMENCE?*/  	linkedList.printList();
 			cout<<334<<endl;				p1 = linkedList.head;cout<<"p1 = "<<p1->x<<", "<<p1->y<<endl;
 			cout<<335<<endl;				p2 = p1->next;cout<<"p2 = "<<p2->x<<", "<<p2->y<<endl;
 			cout<<336<<endl;				p3 = p2->next;cout<<"p3 = "<<p3->x<<", "<<p3->y<<endl;
