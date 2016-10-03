@@ -26,15 +26,15 @@ int scaledMAXWindowy=500;
 
 const int WINDOW_POSITION_X = 100;
 const int WINDOW_POSITION_Y = 100;
-const int WINDOW_MAX_X = 500;
-const int WINDOW_MAX_Y = 500;
+const int WINDOW_MAX_X = 700;
+const int WINDOW_MAX_Y = 700;
 
 // Specify the coordinate ranges for the world coordinates in the 2D Frame
 
-const float WORLD_COORDINATE_MIN_X = 200.0;
-const float WORLD_COORDINATE_MAX_X = 2400.0;
-const float WORLD_COORDINATE_MIN_Y = 200.0;
-const float WORLD_COORDINATE_MAX_Y = 2400.0;
+const float WORLD_COORDINATE_MIN_X = 000.0;
+const float WORLD_COORDINATE_MAX_X = 0700.0;
+const float WORLD_COORDINATE_MIN_Y = 000.0;
+const float WORLD_COORDINATE_MAX_Y = 0700.0;
 
 
 void myglutInit( int argc, char** argv )
@@ -109,15 +109,7 @@ void display( void )
 
     p[0] = 100; 
     p[1] = 100;
-   
-    /* plot new point */
-
-        glBegin(GL_POINTS);
-            glVertex2fv(p); 
-        glEnd();
-  
      
-     glFlush(); /* clear buffers */
 
  }
 
@@ -156,27 +148,6 @@ GLfloat angleBetween(vertex *p1, vertex *p2, vertex *p3)
 
 	return theta;
 }
-//CROSSPRODUCT WORKS FOR SURE
-GLfloat crossProduct(struct vertex *point1, struct vertex *point2, struct vertex *point3)
-{
-	if(point1==NULL || point2==NULL)
-		return 0;
-	
-	GLfloat line1x, line1y, line1z, line2x, line2y, line2z, crossProductZcomponent;
-	
-	line1x = (point1->x) - (point2->x);
-	line1y = (point1->y) - (point2->y);
-	line1z = 0.0;
-
-	line2x = (point3->x) - (point2->x);
-	line2y = (point3->y) - (point2->y);
-	line2z = 0.0;
-
-	crossProductZcomponent = (line1x * line2y) - (line2x * line1y);
-
-	return crossProductZcomponent;
-}
-//
 bool intersect(vertex *point1, vertex *point2, vertex *point3, vertex *point4)
 {
 	bool intersects = false;
@@ -203,6 +174,8 @@ bool intersect(vertex *point1, vertex *point2, vertex *point3, vertex *point4)
 	return intersects;
 }
 
+
+
 bool noIntersects(singly linkedlist,vertex *lastVertex, vertex *newVertex)
 {
 	if (linkedlist.getLength() < 3)
@@ -223,6 +196,64 @@ bool noIntersects(singly linkedlist,vertex *lastVertex, vertex *newVertex)
 
 	return true;
 }
+int numIntersects4Interior(singly linkedlist,GLfloat vertexX, GLfloat vertexY)
+{
+	int county = 0;
+	struct vertex *midpoint = linkedList.createVertex(vertexX, vertexY);
+	struct vertex *boundaryPoint = linkedList.createVertex(WINDOW_MAX_X, vertexY);
+	struct vertex *anotherLineVertex1=linkedlist.head;
+	struct vertex *anotherLineVertex2=linkedlist.head->next;
+	while (anotherLineVertex2!=NULL)
+	{
+		cout <<"time to county!\n";
+		if(intersect(midpoint, boundaryPoint, anotherLineVertex1, anotherLineVertex2))	{
+			county++;
+			cout<<county<<endl;
+		}
+
+		anotherLineVertex1=anotherLineVertex2;
+		anotherLineVertex2=anotherLineVertex2->next;
+	}
+	cout<<"county is "<< county <<endl;
+	return county;
+}
+bool inThatThang(vertex *p1, vertex *p2)
+{
+
+	GLfloat line1x=p1->x, line1y=p1->y;
+	GLfloat line2x=p2->x, line2y=p2->y;
+
+	GLfloat middyBoyX = (line1x + line2x)/2.0; 
+	GLfloat middyBoyY= (line1y + line2y)/2.0;
+	
+	int crossy = numIntersects4Interior(linkedList, middyBoyX, middyBoyY);
+
+	if (crossy%2==1)
+		return true;//this is good
+	else
+		return false;//no bueno
+}
+//CROSSPRODUCT WORKS FOR SURE
+GLfloat crossProduct(struct vertex *point1, struct vertex *point2, struct vertex *point3)
+{
+	if(point1==NULL || point2==NULL)
+		return 0;
+	
+	GLfloat line1x, line1y, line1z, line2x, line2y, line2z, crossProductZcomponent;
+	
+	line1x = (point1->x) - (point2->x);
+	line1y = (point1->y) - (point2->y);
+	line1z = 0.0;
+
+	line2x = (point3->x) - (point2->x);
+	line2y = (point3->y) - (point2->y);
+	line2z = 0.0;
+
+	crossProductZcomponent = (line1x * line2y) - (line2x * line1y);
+
+	return crossProductZcomponent;
+}
+//
 
 void drawBox( int x, int y )
 {
@@ -321,6 +352,7 @@ void lineEmUpSucka()
 }
 void commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *p2, struct vertex *p3)
 {
+	cout<<"xxxxxxxxxxxxxxxx\n";cout<<inThatThang(p1,p3)<<"\nxxxxxxxxxxxxxxxx\n"<<endl;
 	if (p1==NULL || p2 ==NULL || p3==NULL)
 		return;
 	if(crossProduct(p1, p2, p3) == 0.0){
@@ -328,8 +360,8 @@ void commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *p2
 		return;
 	}
 	else if(crossProduct(p1, p2, p3) < 0.0 && 
-		noIntersects(linkedlist, p1, p3) && 
-		angleBetween(p2,p3,linkedlist.head) < angleBetween(p2,p3,p3->next))
+		noIntersects(linkedlist, p1, p3) && (inThatThang(p1, p3) || 
+		angleBetween(p2,p3,linkedlist.head) < angleBetween(p2,p3,p3->next)))
 	{cout<<291<<endl;
 		glBegin(GL_LINES);
 			glVertex2f(p1->x, p1->y);
@@ -344,9 +376,14 @@ void commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *p2
 	}
 	else
 	{//MOVE THE VERTICES DOWN THE LIST
-		p1=p2;cout<<364<<endl;
-		p2=p3;cout<<365<<endl;
-		p3=p3->next;cout<<366<<endl;
+		p1=p2;		cout<<364<<endl;
+		p2=p3;		cout<<365<<endl;
+		if (p3==linkedlist.last()){
+			p3=linkedlist.head;	cout<<366<<endl;
+		}
+		else{
+			p3=p3->next;cout<<393<<endl;
+		}
 		commenceTesselation(linkedlist, p1, p2 , p3);cout<<"after angle > 180, list is\n";linkedlist.printList();
 //		p1=linkedlist.head;
 //		p2=p1->next;
@@ -370,7 +407,7 @@ void tesselateItSucka()
 		{cout<<323<<endl;
 			if (linkedList.getLength() == 4 && crossProduct(p1,p2,p3)>0.0)//if 4 sided and clockwise
 			{
-				if (angleBetween(p2,p3,linkedList.head) > angleBetween(p2,p3,p3->next))
+				if (angleBetween(p2,p3,linkedList.head) > angleBetween(p2,p3,p3->next)/*inThatThang(p1,p3)*/)
 				{
 					glBegin(GL_LINES);
 						glVertex2f(p2->x, p2->y);
@@ -391,7 +428,7 @@ void tesselateItSucka()
 			}
 			else if (linkedList.getLength() == 4 && crossProduct(p1,p2,p3)<0.0)//if 4 sided and counterclockwise
 			{
-				if( angleBetween(p2,p3,linkedList.head) < angleBetween(p2,p3,p3->next))
+				if(/*inThatThang(p1,p3)*/ angleBetween(p2,p3,linkedList.head) < angleBetween(p2,p3,p3->next))
 				{
 					glBegin(GL_LINES);
 						glVertex2f(p1->x, p1->y);
