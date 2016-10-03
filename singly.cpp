@@ -8,6 +8,7 @@ class singly
 		void deleteTheWholeDamnThing();
 		int getLength();
 		void printList();
+		vertex* last();
 		vertex *head;
 		singly()
 		{
@@ -73,7 +74,15 @@ void singly::append(vertex *node)
 	}
 	length++;
 }
-
+vertex* singly::last()
+{
+	vertex *lasty = head;
+	while(lasty->next!=NULL)
+	{
+		lasty=lasty->next;
+	}
+	return lasty;
+}
 void singly::deleteVertex(vertex *node)
 {
 

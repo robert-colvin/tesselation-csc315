@@ -5,6 +5,7 @@ using namespace std;
 #include <GL/glut.h>
 #include <stdio.h>
 #include <iostream>
+#include <math.h>
 #include "structs.h"
 #include "singly.cpp"
 
@@ -53,7 +54,7 @@ void myInit(void)
 
       glClearColor(1.0, 1.0, 1.0, 1.0); /* white background */
       glColor3f(1.0, 0.0, 0.0); /* draw in red */
-      glPointSize(5.0);
+      glPointSize(15.0);
 
       COLORS_DEFINED = 0;
 
@@ -120,13 +121,12 @@ void display( void )
 
  }
 
-//CROSSPRODUCT WORKS FOR SURE
-GLfloat crossProduct(struct vertex *point1, struct vertex *point2, struct vertex *point3)
+GLfloat dotProduct(struct vertex *point1, struct vertex *point2, struct vertex *point3)
 {
 	if(point1==NULL || point2==NULL)
 		return 0;
 	
-	GLfloat line1x, line1y, line1z, line2x, line2y, line2z, crossProduct;
+	GLfloat line1x, line1y, line1z, line2x, line2y, line2z, dotProduct;
 	
 	line1x = (point1->x) - (point2->x);
 	line1y = (point1->y) - (point2->y);
@@ -136,9 +136,45 @@ GLfloat crossProduct(struct vertex *point1, struct vertex *point2, struct vertex
 	line2y = (point3->y) - (point2->y);
 	line2z = 0.0;
 
-	crossProduct = (line1x * line2y) - (line2x * line1y);
+	dotProduct = (line1x * line2x) + (line2y * line1y) + (line1z * line2z);;
 
-	return crossProduct;
+	return dotProduct;
+}
+
+GLfloat magnitudeOf(vertex *point1, vertex *point2)
+{
+	GLfloat lineX = (point1->x) - (point2->x);
+	GLfloat lineY = (point1->y) - (point2->y);
+	return sqrt (	pow(lineX, 2.0) + pow(lineY, 2.0)  );
+}
+GLfloat angleBetween(vertex *p1, vertex *p2, vertex *p3)
+{
+	//cos (theta) = dotProduct(p1,p2,p3)/(magnitudeOf(p1,p2) * magnitudeOf(p2,p3))
+	GLfloat cosTheta, theta;
+	cosTheta = dotProduct(p1,p2,p3)/(  magnitudeOf(p1,p2) * magnitudeOf(p2,p3)  );
+	theta = acos(cosTheta);
+
+	return theta;
+}
+//CROSSPRODUCT WORKS FOR SURE
+GLfloat crossProduct(struct vertex *point1, struct vertex *point2, struct vertex *point3)
+{
+	if(point1==NULL || point2==NULL)
+		return 0;
+	
+	GLfloat line1x, line1y, line1z, line2x, line2y, line2z, crossProductZcomponent;
+	
+	line1x = (point1->x) - (point2->x);
+	line1y = (point1->y) - (point2->y);
+	line1z = 0.0;
+
+	line2x = (point3->x) - (point2->x);
+	line2y = (point3->y) - (point2->y);
+	line2z = 0.0;
+
+	crossProductZcomponent = (line1x * line2y) - (line2x * line1y);
+
+	return crossProductZcomponent;
 }
 //
 bool intersect(vertex *point1, vertex *point2, vertex *point3, vertex *point4)
@@ -197,7 +233,7 @@ void drawBox( int x, int y )
 
     // Added code to print window coordinates and world coordinates
     
-    printf ("%d   %d (window coordinates) ", x, WINDOW_MAX_Y - y );
+  //  printf ("%d   %d (window coordinates) ", x, WINDOW_MAX_Y - y );
 
     // I switch the mouse coordinate below and...
 
@@ -222,7 +258,7 @@ void drawBox( int x, int y )
     {
     	linkedList.append(newVertex); 
    
-  	  printf ("\t  %f   %f (world coordinates) \n", p[0], p[1] );
+//  	  printf ("\t  %f   %f (world coordinates) \n", p[0], p[1] );
 
 	    glBegin(GL_POINTS);
 		    glVertex2fv(p); 
@@ -233,7 +269,7 @@ void drawBox( int x, int y )
     }
     else
     {
-	    cout << "New point not added. Points may only be added in a counterclockwise or linear matter" << endl;
+	    cout << "New point not added. Points may only be added such that it creates no intersecting lines if we connect the dots" << endl;
     }
 }
 
@@ -283,11 +319,17 @@ void lineEmUpSucka()
 	glEnd();
 	glFlush();
 }
-/*singly*/void commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *p2, struct vertex *p3)
+void commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *p2, struct vertex *p3)
 {
 	if (p1==NULL || p2 ==NULL || p3==NULL)
-		return/* linkedlist*/;
-	if(crossProduct(p1, p2, p3) < 0.0 && noIntersects(linkedlist, p1, p3))
+		return;
+	if(crossProduct(p1, p2, p3) == 0.0){
+		linkedlist.deleteVertex(p2);
+		return;
+	}
+	else if(crossProduct(p1, p2, p3) < 0.0 && 
+		noIntersects(linkedlist, p1, p3) && 
+		angleBetween(p2,p3,linkedlist.head) < angleBetween(p2,p3,p3->next))
 	{cout<<291<<endl;
 		glBegin(GL_LINES);
 			glVertex2f(p1->x, p1->y);
@@ -295,24 +337,23 @@ void lineEmUpSucka()
 		glEnd();
 		glFlush();
 		cout<<297<<endl;
-		cout<<"pre-delete"<<endl;
-		linkedlist.printList();
 		linkedlist.deleteVertex(p2);
-		cout<<"post-delete"<<endl;
-		linkedlist.printList();
 		cout<<299<<endl;
-
-//		return linkedlist;
+		cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n";
+		return;
 	}
 	else
-	{
-		p1=p2;cout<<308<<endl;
-		p2=p3;cout<<309<<endl;
-		p3=p3->next;cout<<310<<endl;
-
-		/*linkedlist = */commenceTesselation(linkedlist, p1, p2 , p3);cout<<"after angle > 180, list is\n";linkedlist.printList();
+	{//MOVE THE VERTICES DOWN THE LIST
+		p1=p2;cout<<364<<endl;
+		p2=p3;cout<<365<<endl;
+		p3=p3->next;cout<<366<<endl;
+		commenceTesselation(linkedlist, p1, p2 , p3);cout<<"after angle > 180, list is\n";linkedlist.printList();
+//		p1=linkedlist.head;
+//		p2=p1->next;
+//		p3=p2->next;
 		cout<<313<<endl;
 	}
+cout<<"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 }
 void tesselateItSucka()
 {
@@ -324,17 +365,63 @@ void tesselateItSucka()
 		struct vertex *p1 = linkedList.head;
 		struct vertex *p2 = p1->next;
 		struct vertex *p3 = p2->next;
-
+		
 		while (linkedList.getLength() > 3)
 		{cout<<323<<endl;
-			cout<<333<<endl;			/*linkedList = */commenceTesselation(linkedList, p1, p2, p3);cout<<"after returning the list"<<endl;	
+			if (linkedList.getLength() == 4 && crossProduct(p1,p2,p3)>0.0)//if 4 sided and clockwise
+			{
+				if (angleBetween(p2,p3,linkedList.head) > angleBetween(p2,p3,p3->next))
+				{
+					glBegin(GL_LINES);
+						glVertex2f(p2->x, p2->y);
+						glVertex2f(linkedList.last()->x, linkedList.last()->y);
+					glEnd();
+					glFlush();
+					break;
+				}
+				else
+				{
+					glBegin(GL_LINES);
+						glVertex2f(p1->x, p1->y);
+						glVertex2f(p3->x, p3->y);
+					glEnd();
+					glFlush();
+					break;
+				}
+			}
+			else if (linkedList.getLength() == 4 && crossProduct(p1,p2,p3)<0.0)//if 4 sided and counterclockwise
+			{
+				if( angleBetween(p2,p3,linkedList.head) < angleBetween(p2,p3,p3->next))
+				{
+					glBegin(GL_LINES);
+						glVertex2f(p1->x, p1->y);
+						glVertex2f(p3->x, p3->y);
+					glEnd();
+					glFlush();
+					break;
+				}
+				else
+				{
+					glBegin(GL_LINES);
+						glVertex2f(p2->x, p2->y);
+						glVertex2f(linkedList.last()->x, linkedList.last()->y);
+					glEnd();
+					glFlush();
+					break;
+				}
+			}
+			else
+			{
+			cout<<333<<endl;				commenceTesselation(linkedList, p1, p2, p3);cout<<"after returning the list"<<endl;	
 /*CRASHING HERE, LIST ISN'T RIGHT, RETURNING WRONG FROM COMMENCE?*/  	linkedList.printList();
 			cout<<334<<endl;				p1 = linkedList.head;cout<<"p1 = "<<p1->x<<", "<<p1->y<<endl;
 			cout<<335<<endl;				p2 = p1->next;cout<<"p2 = "<<p2->x<<", "<<p2->y<<endl;
 			cout<<336<<endl;				p3 = p2->next;cout<<"p3 = "<<p3->x<<", "<<p3->y<<endl;
-		cout<<337<<endl;}
-	cout<<338<<endl;}
-cout<<339<<endl;}
+			}
+		}
+	}
+cout<<339<<endl;
+}
 
 void eraseBox( int x, int y )
 {
