@@ -1,17 +1,26 @@
+using namespace std;
+
+#include <stdio.h>
+#include <iostream>
+#include "structs.h"
 
 class singly
 {
 	public:
 		vertex* createVertex(GLfloat xCoord, GLfloat yCoord);
+		triangle* createTriangle(vertex *vert1, vertex *vert2, vertex *vert3);
 		void append(vertex *node);
+		void append(triangle *node);
 		void deleteVertex(vertex *node);
 		void deleteTheWholeDamnThing();
 		int getLength();
 		void printList();
 		vertex* last();
 		vertex *head;
+		triangle *t_head;
 		singly()
 		{
+			t_head = new struct triangle;
 			head = new struct vertex;
 			head=NULL;
 			length=0;
@@ -50,6 +59,25 @@ vertex* singly::createVertex(GLfloat xCoord, GLfloat yCoord)
 		return temp;
 	}
 }
+/*triangle* singly::createTriangle( vertex *vert1, vertex *vert2, vertex *vert3)
+{
+	struct triangle *temp;
+	temp = new(struct triangle);
+	if(temp==NULL)
+	{
+		cout << "catastrophe in triangle creation." << endl;
+		exit(0);
+	}
+	else
+	{
+		temp->p1=vert1;
+		temp->p2=vert2;
+		temp->p3=vert3;
+		temp->next=NULL;
+
+		return temp;
+	}
+}*/
 void singly::append(vertex *node)
 {
 	struct vertex *tempStart;
@@ -58,7 +86,7 @@ void singly::append(vertex *node)
 	{//if list is empty aka this is first entry
 		head=node;
 		head->next=NULL;
-		cout << "NEW HEAD IS " << node->x << " " << node->y << endl;
+	//	cout << "NEW HEAD IS " << node->x << " " << node->y << endl;
 	}
 	else
 	{//otherwise...
@@ -70,10 +98,34 @@ void singly::append(vertex *node)
 		node->next=NULL;
 		//append new node to last node in list
 		tempStart->next=node;
-		cout << "APPENDED " << node->x << " " << node->y << endl;//announce it for the world to see
+	//	cout << "APPENDED " << node->x << " " << node->y << endl;//announce it for the world to see
 	}
 	length++;
 }
+/*void singly::append(triangle *node)
+{
+	struct triangle *tempStart;
+	tempStart=t_head;
+	if(t_head==NULL)
+	{//if list is empty aka this is first entry
+		t_head=node;
+		t_head->next=NULL;
+	//	cout << "NEW HEAD IS " << node->x << " " << node->y << endl;
+	}
+	else
+	{//otherwise...
+		while(tempStart->next != NULL)//until you get to last node
+		{//move down the list one by one
+			 tempStart=tempStart->next;
+		}//when you get to last node...
+		//ensure new node's next is NULL to be safe or something
+		node->next=NULL;
+		//append new node to last node in list
+		tempStart->next=node;
+	//	cout << "APPENDED " << node->x << " " << node->y << endl;//announce it for the world to see
+	}
+	length++;
+}*/
 vertex* singly::last()
 {
 	vertex *lasty = head;

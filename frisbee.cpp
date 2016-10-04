@@ -4,18 +4,20 @@ using namespace std;
 
 #include <GL/glut.h>
 #include <stdio.h>
-#include <iostream>
-#include <math.h>
-#include "structs.h"
-#include "singly.cpp"
+#include <iostream>//for cout
+#include <math.h>//for math functions
+#include <vector>//for triangles
+#include "singly.cpp"//homemade linkedlist, not very generic though
 
 // These are defined in a global scope
 
 GLubyte red, green, blue;
 int COLORS_DEFINED;
 
-singly linkedList;
-struct vertex *lastPoint=NULL;
+singly linkedList;//list of points
+singly linkedPolygonList;//for filled polygon after tesselation
+vector<triangle> triangles;//vector of triangle
+struct vertex *lastPoint=NULL;//these 2 ptrs help with tesselation
 struct vertex *twoPointsAgo=NULL;
 
 float scaledx;
@@ -66,25 +68,6 @@ void myInit(void)
                  WORLD_COORDINATE_MIN_Y, WORLD_COORDINATE_MAX_Y);
       glMatrixMode(GL_MODELVIEW);
 }
-/*
-void reshape(int newx, int newy)
-{
-      float scaledMaxX, scaledMaxY;
-      scaledx = (float) newx/(float) WINDOW_MAX_X;
-      scaledy = (float) newy/(float) WINDOW_MAX_Y;
-
-      scaledMaxX=WORLD_COORDINATE_MIN_X+scaledx * (WORLD_COORDINATE_MAX_X-WORLD_COORDINATE_MIN_X);
-
-      scaledMaxY=WORLD_COORDINATE_MIN_Y+scaledy * (WORLD_COORDINATE_MAX_Y-WORLD_COORDINATE_MIN_Y);
-      
-      glMatrixMode(GL_PROJECTION);
-      glLoadIdentity();
-      gluOrtho2D(WORLD_COORDINATE_MIN_X, scaledMaxX,
-                 WORLD_COORDINATE_MIN_Y, scaledMaxY);
-      glMatrixMode(GL_MODELVIEW);
-      glViewport(0,0,newx, newy);
-}
-*/
 
 void display( void )
 {
@@ -112,7 +95,7 @@ void display( void )
      
 
  }
-
+//dot product function for 2 line segments that share an endpoint
 GLfloat dotProduct(struct vertex *point1, struct vertex *point2, struct vertex *point3)
 {
 	if(point1==NULL || point2==NULL)
@@ -132,22 +115,23 @@ GLfloat dotProduct(struct vertex *point1, struct vertex *point2, struct vertex *
 
 	return dotProduct;
 }
-
+//to find the magnitude of a vector
 GLfloat magnitudeOf(vertex *point1, vertex *point2)
 {
 	GLfloat lineX = (point1->x) - (point2->x);
 	GLfloat lineY = (point1->y) - (point2->y);
 	return sqrt (	pow(lineX, 2.0) + pow(lineY, 2.0)  );
 }
+//using dot product and magnitude to find angle between 2 vectors
 GLfloat angleBetween(vertex *p1, vertex *p2, vertex *p3)
 {
-	//cos (theta) = dotProduct(p1,p2,p3)/(magnitudeOf(p1,p2) * magnitudeOf(p2,p3))
 	GLfloat cosTheta, theta;
 	cosTheta = dotProduct(p1,p2,p3)/(  magnitudeOf(p1,p2) * magnitudeOf(p2,p3)  );
 	theta = acos(cosTheta);
 
 	return theta;
 }
+//uses algorithm from class to determine if two line segments intersect
 bool intersect(vertex *point1, vertex *point2, vertex *point3, vertex *point4)
 {
 	bool intersects = false;
@@ -175,7 +159,7 @@ bool intersect(vertex *point1, vertex *point2, vertex *point3, vertex *point4)
 }
 
 
-
+//does the above function for all lines in list
 bool noIntersects(singly linkedlist,vertex *lastVertex, vertex *newVertex)
 {
 	if (linkedlist.getLength() < 3)
@@ -196,6 +180,7 @@ bool noIntersects(singly linkedlist,vertex *lastVertex, vertex *newVertex)
 
 	return true;
 }
+//a check for if a line exists in a polygon
 int numIntersects4Interior(singly linkedlist,GLfloat vertexX, GLfloat vertexY)
 {
 	int county = 0;
@@ -205,7 +190,6 @@ int numIntersects4Interior(singly linkedlist,GLfloat vertexX, GLfloat vertexY)
 	struct vertex *anotherLineVertex2=linkedlist.head->next;
 	while (anotherLineVertex2!=NULL)
 	{
-		cout <<"time to county!\n";
 		if(intersect(midpoint, boundaryPoint, anotherLineVertex1, anotherLineVertex2))	{
 			county++;
 			cout<<county<<endl;
@@ -217,6 +201,7 @@ int numIntersects4Interior(singly linkedlist,GLfloat vertexX, GLfloat vertexY)
 	cout<<"county is "<< county <<endl;
 	return county;
 }
+//checks if proposed line will exists in side polygon by checking how many times it intersects as it goes to the edge of the window
 bool inThatThang(vertex *p1, vertex *p2)
 {
 
@@ -228,12 +213,12 @@ bool inThatThang(vertex *p1, vertex *p2)
 	
 	int crossy = numIntersects4Interior(linkedList, middyBoyX, middyBoyY);
 
-	if (crossy%2==1)
+	if (crossy%2==1)//if it crosses an odd number of lines, it will exist inside the polygon
 		return true;//this is good
 	else
 		return false;//no bueno
 }
-//CROSSPRODUCT WORKS FOR SURE
+//crossproduct function for 2 line segments that share a point
 GLfloat crossProduct(struct vertex *point1, struct vertex *point2, struct vertex *point3)
 {
 	if(point1==NULL || point2==NULL)
@@ -283,29 +268,29 @@ void drawBox( int x, int y )
     p[1] = WORLD_COORDINATE_MIN_Y +  p[1] / WINDOW_MAX_Y * 
                                     (WORLD_COORDINATE_MAX_Y - WORLD_COORDINATE_MIN_Y);
 
-    vertex *newVertex = linkedList.createVertex(p[0],p[1]);
+    vertex *newVertex = linkedList.createVertex(p[0],p[1]);//create a vertex from mouse coords when clicked
     
-    if(noIntersects(linkedList, lastPoint, newVertex))
-    {
-    	linkedList.append(newVertex); 
-   
-//  	  printf ("\t  %f   %f (world coordinates) \n", p[0], p[1] );
-
+    if(noIntersects(linkedList, lastPoint, newVertex))//if neither the line from this point to the previous point NOR the line from this point to the head
+    {//intersect any other point
+    	linkedList.append(newVertex); //add that point to the list
+	    //draw the point
 	    glBegin(GL_POINTS);
 		    glVertex2fv(p); 
 	    glEnd();
 	    glFlush();
+		
+	    //update most recent points
 	    twoPointsAgo=lastPoint;
 	    lastPoint=newVertex;
     }
-    else
+    else//if point will cause an intersection
     {
 	    cout << "New point not added. Points may only be added such that it creates no intersecting lines if we connect the dots" << endl;
     }
 }
-
+//to draw a filled, untesselated polygon
 void makeThePolygonSucka()
-{
+{//loop through list of points and feed it to the glBegin
 	struct vertex *pointy = linkedList.head;
 	glBegin(GL_POLYGON);
 		while(pointy!=NULL)
@@ -316,17 +301,34 @@ void makeThePolygonSucka()
 	glEnd();
 	glFlush();
 }
+//post tesselation polygon goodness
+void theresANewPolygonInTown()
+{//loop through vector of triangle structs and feed each point to glBegin as TRIANGLES
+	vector<triangle>::iterator it;
 
+	glBegin(GL_TRIANGLES);
+		for(it=triangles.begin(); it!=triangles.end(); ++it)
+		{
+			vertex *p1=it->p1; vertex *p2=it->p2; vertex *p3=it->p3;
+		
+			glVertex2f(p1->x, p1->y);
+			glVertex2f(p2->x, p2->y);
+			glVertex2f(p3->x, p3->y);
+		}
+	glEnd();
+	glFlush();
+}
+//clear the screen
 void whiteItOut()
 {
 	glColor3f(1.0, 1.0, 1.0);
 	makeThePolygonSucka();
 	glColor3f(1.0, 0.0, 0.0);
 }
-
+//to connect the dots in the order they were added
 void lineEmUpSucka()
 {
-	
+	//kick you out if you try to connect just 1 point
 	if (linkedList.head==NULL || linkedList.head->next==NULL)
 	{
 		cout << "can't draw lines with fewer than 2 points" << endl;
@@ -334,7 +336,7 @@ void lineEmUpSucka()
 	}
 	struct vertex *firstPoint=linkedList.head;
 	struct vertex *secondPoint=linkedList.head->next;
-	
+	//loop through list and connect each point one by one in the order it was put in list
 	while (secondPoint!=NULL)
 	{
 		glBegin(GL_LINES);
@@ -344,76 +346,105 @@ void lineEmUpSucka()
 		firstPoint=secondPoint;
 		secondPoint=secondPoint->next;
 	}
+	//connect final point to head
 	glBegin(GL_LINES);
 		glVertex2f(firstPoint->x, firstPoint->y);
 		glVertex2f(linkedList.head->x, linkedList.head->y);
 	glEnd();
 	glFlush();
 }
+//sexy recursive tesselator function
 void commenceTesselation(singly linkedlist, struct vertex *p1, struct vertex *p2, struct vertex *p3)
 {
-	cout<<"xxxxxxxxxxxxxxxx\n";cout<<inThatThang(p1,p3)<<"\nxxxxxxxxxxxxxxxx\n"<<endl;
-	if (p1==NULL || p2 ==NULL || p3==NULL)
+	
+	if (p1==NULL || p2 ==NULL || p3==NULL)//basically an error check
 		return;
-	if(crossProduct(p1, p2, p3) == 0.0){
+	if(crossProduct(p1, p2, p3) == 0.0)//if the 3 points we're working on are colinear, delete the second point and get out
+	{
 		linkedlist.deleteVertex(p2);
 		return;
 	}
 	else if(crossProduct(p1, p2, p3) < 0.0 && 
-		noIntersects(linkedlist, p1, p3) && (inThatThang(p1, p3) || 
-		angleBetween(p2,p3,linkedlist.head) < angleBetween(p2,p3,p3->next)))
-	{cout<<291<<endl;
+		noIntersects(linkedlist, p1, p3) && inThatThang(p1, p3)) //if 3 points are countersclockwise, don't intersect anything if triangulated, and
+	{//will draw a line within the shape
+		//draw it
 		glBegin(GL_LINES);
 			glVertex2f(p1->x, p1->y);
 			glVertex2f(p3->x, p3->y);
 		glEnd();
 		glFlush();
-		cout<<297<<endl;
+		//add a triangle struct of these points to the vector
+		struct triangle TDawg = {p1, p2, p3};
+		triangles.push_back(TDawg);
+
+		//delete point from list	
 		linkedlist.deleteVertex(p2);
-		cout<<299<<endl;
-		cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n";
+
 		return;
 	}
-	else
+	else//if it fails the tests
 	{//MOVE THE VERTICES DOWN THE LIST
-		p1=p2;		cout<<364<<endl;
-		p2=p3;		cout<<365<<endl;
+		p1=p2;		
+		p2=p3;	
 		if (p3==linkedlist.last()){
-			p3=linkedlist.head;	cout<<366<<endl;
+			p3=linkedlist.head;	
 		}
 		else{
-			p3=p3->next;cout<<393<<endl;
+			p3=p3->next;
 		}
-		commenceTesselation(linkedlist, p1, p2 , p3);cout<<"after angle > 180, list is\n";linkedlist.printList();
-//		p1=linkedlist.head;
-//		p2=p1->next;
-//		p3=p2->next;
-		cout<<313<<endl;
+		//recursion incoming w/ new points
+		commenceTesselation(linkedlist, p1, p2 , p3);
 	}
-cout<<"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 }
 void tesselateItSucka()
-{
+{//starts tesselation
+	//grab first 3 points
+	struct vertex *p1 = linkedList.head;
+	struct vertex *p2 = p1->next;
+	struct vertex *p3 = p2->next;
+	
+	//draw outline of shape
 	lineEmUpSucka();
-	if (linkedList.getLength() <= 3)
+	if (linkedList.getLength() < 3)//less than 3 points, do nothing
 		return;
-	else
+	if (linkedList.getLength()==3)//equal to 3 points, already a triangle; add it to vector and leave
 	{
-		struct vertex *p1 = linkedList.head;
-		struct vertex *p2 = p1->next;
-		struct vertex *p3 = p2->next;
+		struct triangle TDawg = {p1,p2,p3};
+		triangles.push_back(TDawg);
+		return;
+	}
+	else//4 points or more
+	{
 		
-		while (linkedList.getLength() > 3)
-		{cout<<323<<endl;
+		while (linkedList.getLength() >= 3)//tessy loop
+		{
+			if (linkedList.getLength()==3)//when the list is deleted down to 3 vertices, add that triangle to vector and leave
+			{
+				p1=linkedList.head; p2=p1->next; p3=p2->next;
+				struct triangle TDawg = {p1, p2, p3};
+				triangles.push_back(TDawg);
+
+				break;
+			}
 			if (linkedList.getLength() == 4 && crossProduct(p1,p2,p3)>0.0)//if 4 sided and clockwise
 			{
-				if (angleBetween(p2,p3,linkedList.head) > angleBetween(p2,p3,p3->next)/*inThatThang(p1,p3)*/)
-				{
+				vertex *p4 = p3->next;
+
+				if (angleBetween(p2,p3,linkedList.head) > angleBetween(p2,p3,p3->next))//if line will not exist within polygon
+				{//draw other line in quadrilateral, delete vertex from list, add triangle to vector; rinse repeat for following
+
 					glBegin(GL_LINES);
 						glVertex2f(p2->x, p2->y);
-						glVertex2f(linkedList.last()->x, linkedList.last()->y);
+						glVertex2f(p4->x, p4->y);
 					glEnd();
 					glFlush();
+					
+					linkedList.deleteVertex(p3);
+
+					struct triangle TDawg = {p2, p3, p4};
+					struct triangle TShizzle = {p1, p2, p4};
+					triangles.push_back(TDawg);
+					triangles.push_back(TShizzle);
 					break;
 				}
 				else
@@ -423,41 +454,68 @@ void tesselateItSucka()
 						glVertex2f(p3->x, p3->y);
 					glEnd();
 					glFlush();
+	
+					linkedList.deleteVertex(p2);
+					
+					struct triangle TDawg = {p1, p2, p3};
+					struct triangle TShizzle = {p1, p3, p4};
+					triangles.push_back(TShizzle);
+					triangles.push_back(TDawg);
 					break;
 				}
 			}
 			else if (linkedList.getLength() == 4 && crossProduct(p1,p2,p3)<0.0)//if 4 sided and counterclockwise
 			{
-				if(/*inThatThang(p1,p3)*/ angleBetween(p2,p3,linkedList.head) < angleBetween(p2,p3,p3->next))
+				vertex *p4 = p3->next;
+
+				if(angleBetween(p2,p3,linkedList.head) < angleBetween(p2,p3,p3->next))
 				{
 					glBegin(GL_LINES);
 						glVertex2f(p1->x, p1->y);
 						glVertex2f(p3->x, p3->y);
 					glEnd();
 					glFlush();
+
+					struct triangle TDawg = {p1, p2, p3};
+					struct triangle TShizzle = {p1, p3, p4};
+					triangles.push_back(TShizzle);
+					triangles.push_back(TDawg);
 					break;
 				}
 				else
 				{
+					vertex *p4 = linkedList.last();
 					glBegin(GL_LINES);
 						glVertex2f(p2->x, p2->y);
-						glVertex2f(linkedList.last()->x, linkedList.last()->y);
+						glVertex2f(p4->x, p4->y);
 					glEnd();
 					glFlush();
+
+					struct triangle TDawg = {p2, p3, p4};
+					struct triangle TShizzle = {p1, p2, p4};
+					triangles.push_back(TDawg);
+					triangles.push_back(TShizzle);
 					break;
 				}
 			}
 			else
 			{
-			cout<<333<<endl;				commenceTesselation(linkedList, p1, p2, p3);cout<<"after returning the list"<<endl;	
-/*CRASHING HERE, LIST ISN'T RIGHT, RETURNING WRONG FROM COMMENCE?*/  	linkedList.printList();
-			cout<<334<<endl;				p1 = linkedList.head;cout<<"p1 = "<<p1->x<<", "<<p1->y<<endl;
-			cout<<335<<endl;				p2 = p1->next;cout<<"p2 = "<<p2->x<<", "<<p2->y<<endl;
-			cout<<336<<endl;				p3 = p2->next;cout<<"p3 = "<<p3->x<<", "<<p3->y<<endl;
+					//more than 4 sides, get to the sexy stuff
+					commenceTesselation(linkedList, p1, p2, p3);	
+					//reset points to first 3after every run through
+					p1 = linkedList.head;
+					p2 = p1->next;
+					p3 = p2->next;
 			}
+			//reset points 
+			p1 = linkedList.head;
+			p2 = p1->next;
+			p3 = p2->next;
+			//for safety i suppose
+			struct triangle TDawg = {p1,p2,p3};
+			triangles.push_back(TDawg);
 		}
 	}
-cout<<339<<endl;
 }
 
 void eraseBox( int x, int y )
@@ -482,8 +540,6 @@ void eraseBox( int x, int y )
     glEnd();
     glFlush();
 }
-
-
 
 
 void clearBox()
@@ -521,24 +577,31 @@ void mouse( int button, int state, int x, int y )
 void keyboard( unsigned char key, int x, int y )
 { 
   if ( key == 'q' || key == 'Q') exit(0);
-  if ( key == 'c' || key == 'C') 
+  if ( key == 'c' || key == 'C') //to start fresh
   {	
 	clearBox();
 	linkedList.deleteTheWholeDamnThing();
 	lastPoint=NULL;
 	twoPointsAgo=NULL;
+	triangles.clear();
   }
-  if ( key == 'l' || key == 'L'){
+  if ( key == 'l' || key == 'L')//to clear and draw outline
+  {
 	  whiteItOut();
 	  lineEmUpSucka();
   }
   if ( key == 'p' || key == 'P' || key == 'f' || key == 'F')
+  {
+	  whiteItOut();
 	  makeThePolygonSucka();
-  
-  if ( key == 't' || key == 'T'){
+  }
+  if ( key == 't' || key == 'T')
+  {
 	  whiteItOut();
 	  tesselateItSucka();
   }
+  if ( key == 'm' || key == 'M')
+	  theresANewPolygonInTown();
 }
 
 
@@ -550,7 +613,6 @@ int main(int argc, char** argv)
 
     // Now start the standard OpenGL glut callbacks //
     
-    //glutReshapeFunc(reshape);
     glutMouseFunc(mouse);  /* Define Mouse Handler */
     glutKeyboardFunc(keyboard); /* Define Keyboard Handler */
     glutDisplayFunc(display); /* Display callback invoked when window opened */
